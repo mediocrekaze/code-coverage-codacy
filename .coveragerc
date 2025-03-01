@@ -1,0 +1,8 @@
+[run]
+branch = True
+source = python/app
+omit = */__init__.py
+
+[report]
+show_missing = True
+skip_covered = True
