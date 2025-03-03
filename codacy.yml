@@ -1,0 +1,22 @@
+coverage:
+  parsers:
+    python: coverage.py
+    java: jacoco
+  reportPaths:
+    - python/coverage.xml
+    - target/site/jacoco/jacoco.xml
+
+engines:
+  eslint:
+    enabled: true
+  pylint:
+    enabled: true
+  checkstyle:
+    enabled: true
+  jacoco:
+    enabled: true
+
+ignorePaths:
+  - "python_app/test/*"
+  - "java_app/src/test/*"
+  - "docs/*"
