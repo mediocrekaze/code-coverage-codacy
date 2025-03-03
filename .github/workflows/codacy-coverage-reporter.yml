@@ -5,6 +5,7 @@ on:
       - opened
     paths-ignore:
       - '.github/workflows/*'
+  workflow_dispatch:
 jobs:
   codacy-coverage-reporter:
     runs-on: ubuntu-latest
