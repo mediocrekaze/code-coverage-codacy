@@ -39,7 +39,7 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: python/coverage.xml
-      - name: Build and Test Java
+      - name: build and test java
         run: |
           cd ../java
           mvn clean test
