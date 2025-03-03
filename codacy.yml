@@ -4,7 +4,7 @@ coverage:
     java: jacoco
   reportPaths:
     - python/coverage.xml
-    - target/site/jacoco/jacoco.xml
+    - java/target/site/jacoco/jacoco.xml
 
 engines:
   eslint:
