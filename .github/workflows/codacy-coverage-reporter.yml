@@ -27,7 +27,7 @@ jobs:
           java-version: '11'
       - name: install dependencies - java
         run: |
-          apt-get install maven
+          sudo apt-get install maven -y
       - name: run test with coverage
         run: |
           cd python
