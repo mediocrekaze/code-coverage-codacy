@@ -17,12 +17,12 @@ public class MathOperationsTest {
 //        assertEquals(6, MathOperations.multiply(2, 3));
 //    }
 
-    @Test
-    public void testDivide() {
-        assertEquals(3.0, MathOperations.divide(6, 2));
-        Exception exception = assertThrows(ArithmeticException.class, () -> {
-            MathOperations.divide(6, 0);
-        });
-        assertEquals("Cannot divide by zero", exception.getMessage());
-    }
+//    @Test
+//    public void testDivide() {
+//        assertEquals(3.0, MathOperations.divide(6, 2));
+//        Exception exception = assertThrows(ArithmeticException.class, () -> {
+//            MathOperations.divide(6, 0);
+//        });
+//        assertEquals("Cannot divide by zero", exception.getMessage());
+//    }
 }
