@@ -42,7 +42,7 @@ jobs:
       - name: build and test java
         run: |
           ls -l
-          cd ../java
+          cd java
           mvn clean test
           mvn jacoco:report
           xmllint --xpath "string(//report/counter[@type='INSTRUCTION']/@covered)" target/site/jacoco/jacoco.xml
