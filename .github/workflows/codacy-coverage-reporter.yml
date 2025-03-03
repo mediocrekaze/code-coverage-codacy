@@ -41,6 +41,7 @@ jobs:
           coverage-reports: python/coverage.xml
       - name: build and test java
         run: |
+          ls -l
           cd ../java
           mvn clean test
           mvn jacoco:report
