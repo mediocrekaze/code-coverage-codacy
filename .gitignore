@@ -3,3 +3,5 @@
 __pycache__
 coverage.xml
 htmlcov
+target
+jacoco-report.txt
