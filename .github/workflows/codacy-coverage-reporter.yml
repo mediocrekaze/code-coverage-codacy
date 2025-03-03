@@ -5,6 +5,7 @@ on:
       - opened
     paths-ignore:
       - '.github/workflows/*'
+  workflow_dispatch:
 jobs:
   codacy-coverage-reporter:
     runs-on: ubuntu-latest
@@ -27,7 +28,7 @@ jobs:
           java-version: '11'
       - name: install dependencies - java
         run: |
-          apt install maven
+          sudo apt-get install maven -y
       - name: run test with coverage
         run: |
           cd python
@@ -41,12 +42,12 @@ jobs:
           coverage-reports: python/coverage.xml
       - name: build and test java
         run: |
-          cd ../java
+          ls -l
+          cd java
           mvn clean test
           mvn jacoco:report
-          xmllint --xpath "string(//report/counter[@type='INSTRUCTION']/@covered)" target/site/jacoco/jacoco.xml
       - name: upload code coverage report to codacy - java
         uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: target/site/jacoco/jacoco.xml
+          coverage-reports: java/target/site/jacoco/jacoco.xml
