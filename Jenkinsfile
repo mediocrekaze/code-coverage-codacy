@@ -1,10 +1,21 @@
 pipeline {
     agent any
-
     stages {
-        stage('Initialize') {
+        stage('build') {
             steps {
-                echo "Pipeline detected."
+                echo "building stage"
+            }
+        }
+        stage('test') {
+            steps {
+                echo "testing stage"
+            }
+        }
+        stage('deploy') {
+            steps {
+                retry(2) {
+                     echo "deploying stage"
+                }
             }
         }
     }
