@@ -5,7 +5,7 @@ pipeline {
             steps {
                 script {
 
-                    def = pr_workspace_label = "workspace"
+                    def pr_workspace_label = "workspace"
 
                     if (!env.CHANGE_ID) {
                         echo "Not a Pull Request build."
