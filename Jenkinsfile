@@ -32,9 +32,11 @@ pipeline {
         }
         stage('build') {
             steps {
-                def pr_changed_files = pullRequest.files.collect { it.getFilename() }
-                pr_changed_files.each { file ->
-                  echo file
+                script {
+                  def pr_changed_files = pullRequest.files.collect { it.getFilename() }
+                  pr_changed_files.each { file ->
+                    echo file
+                  }
                 }
             }
         }
