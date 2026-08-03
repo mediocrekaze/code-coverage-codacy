@@ -22,8 +22,12 @@ pipeline {
                         echo "PR label ${pr_workspace_label } available"
                     }
                 }
-                echo "CHANGE_ID: ${env.CHANGE_ID}"
-                echo "CHANGE_TARGET: ${env.CHANGE_TARGET}"
+                echo "branch name     : ${env.BRANCH_NAME}"
+                echo "build number    : ${env.BUILD_NUMBER}"
+                echo "job name        : ${env.JOB_NAME}"
+                echo "workspace       : ${env.WORKSPACE}"
+                echo "pr number       : ${env.CHANGE_ID}"
+                echo "pr target branch: ${env.CHANGE_TARGET}"
             }
         }
         stage('build') {
