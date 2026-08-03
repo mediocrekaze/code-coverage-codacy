@@ -22,17 +22,20 @@ pipeline {
                         echo "PR label ${pr_workspace_label } available"
                     }
                 }
-                echo "branch name     : ${env.BRANCH_NAME}"
-                echo "build number    : ${env.BUILD_NUMBER}"
-                echo "job name        : ${env.JOB_NAME}"
-                echo "workspace       : ${env.WORKSPACE}"
-                echo "pr number       : ${env.CHANGE_ID}"
-                echo "pr target branch: ${env.CHANGE_TARGET}"
+                echo "branch name     : ${env.BRANCH_NAME}"          // 
+                echo "build number    : ${env.BUILD_NUMBER}"         // jenkins build number
+                echo "job name        : ${env.JOB_NAME}"             // jenkins job name
+                echo "workspace       : ${env.WORKSPACE}"            // jenkins workspace path location
+                echo "pr number       : ${env.CHANGE_ID}"            // github pr number
+                echo "pr target branch: ${env.CHANGE_TARGET}"        // github branch target for pr
             }
         }
         stage('build') {
             steps {
-                echo "building stage"
+                def pr_changed_files = pullRequest.files.collect { it.getFilename() }
+                pr_changed_files.each { file ->
+                  echo file
+                }
             }
         }
         stage('test') {
