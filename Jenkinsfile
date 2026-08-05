@@ -37,7 +37,7 @@ pipeline {
                   pr_changed_files.each { file ->
                     echo file
                   }
-                  echo ${pr_changed_files}
+                  echo "${pr_changed_files}"
                 }
             }
         }
