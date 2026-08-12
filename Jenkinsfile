@@ -1,22 +1,50 @@
-pipeline {
-    agent any
-    stages {
-        stage('build') {
-            steps {
-                echo "building stage"
-            }
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+
+def pr_workspace_label = "workspace"
+
+def environment = [
+  development: [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]    
+]
+
+def pipeline_sample = {
+  stage("build") {
+    parallel(
+      'Europe': {
+        stage('Deploy Europe') {
+          retry(2) {
+            echo "Deploying to Europe EKS..."
+            echo "Europe deployment finished"
+          }
         }
-        stage('test') {
-            steps {
-                echo "testing stage"
-            }
+      },
+      'China': {
+        stage('Deploy China') {
+          retry(2) {
+            echo "Deploying to China EKS..."
+            echo "China deployment finished"
+          }
         }
-        stage('deploy') {
-            steps {
-                retry(2) {
-                     echo "deploying stage"
-                }
-            }
-        }
+      }
+    )
+  }
+}
+
+if(env.CHANGE_ID) {
+  stage("stage env") {
+    echo "hello there!"
+    echo "PR Number : ${pullRequest.number}"
+    echo "Draft     : ${pullRequest.draft}"
+    if (pr_workspace_label in pullRequest.labels.collect { it }) {
+        echo "PR label ${pr_workspace_label} available"
     }
+    echo "branch name      : ${env.BRANCH_NAME}"
+    echo "build number     : ${env.BUILD_NUMBER}"
+    echo "job name         : ${env.JOB_NAME}"
+    echo "workspace        : ${env.WORKSPACE}"
+    echo "pr number        : ${env.CHANGE_ID}"
+    echo "pr target branch : ${env.CHANGE_TARGET}"
+    echo "environment code : ${ env_code }"
+    echo "sample condition : ${ environment.development.env }"
+  }
+  pipeline_sample()
 }
