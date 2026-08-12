@@ -1,3 +1,5 @@
+@Library('demo@main') _
+
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def pr_workspace_label = "workspace"
@@ -45,6 +47,10 @@ if(env.CHANGE_ID) {
     echo "pr target branch : ${env.CHANGE_TARGET}"
     echo "environment code : ${ env_code }"
     echo "sample condition : ${ environment.development.env }"
+    runMe(
+      name: 'mediocre',
+      environment: 'infrastructure'
+    )
   }
   pipeline_sample()
 }
