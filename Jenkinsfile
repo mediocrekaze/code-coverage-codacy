@@ -9,6 +9,10 @@ def environment = [
 ]
 
 def pipeline_sample = {
+  stage("checkout") {
+    checkout(scm)
+  }
+
   stage("build") {
     parallel(
       'Europe': {
