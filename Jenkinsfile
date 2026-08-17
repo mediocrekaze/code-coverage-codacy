@@ -10,7 +10,7 @@ def environment = [
 
 def pipeline_sample = {
   stage("checkout") {
-    checkout(scm)
+    //checkout(scm)
   }
 
   stage("build") {
@@ -57,4 +57,17 @@ if(env.CHANGE_ID) {
     )
   }
   pipeline_sample()
+}
+
+if(env.CHANGE_ID) {
+  runWithPod(cloud: 'demo', container: 'builder') {
+    stage('pod test') {
+      sh 'echo "Hello from Jenkins Kubernetes agent"'
+      sh 'hostname'
+      sh 'cat /etc/os-release'      
+    }
+    stage('pod build') {
+      sh 'echo "running build"'
+    }
+  }
 }
