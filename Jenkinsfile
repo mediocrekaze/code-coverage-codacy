@@ -107,7 +107,7 @@ def stage_phase = [
     [ name: 'workspace3', description: 'i am workspace three' ],
   ],
   [ name: 'build', description: 'i am build' ],
-  [ name: 'build', description: 'i am deployment' ]
+  [ name: 'deployment', description: 'i am deployment' ]
 ]
 
 if(env.CHANGE_ID) {
