@@ -16,19 +16,6 @@ def node_config = [
   ]
 ]
 
-def stage_phase = [
-  [ name: 'configuration', description: 'i am configuration' ],
-  [ name: 'dependencies', description: 'i am dependencies' ],
-  [
-    [ name: 'workspace1', description: 'i am workspace one' ],
-    [ name: 'workspace2', description: 'i am workspace two' ],
-    [ name: 'workspace3', description: 'i am workspace three' ],
-  ],
-  [ name: 'build', description: 'i am build' ],
-  [ name: 'build', description: 'i am deployment' ]
-]
-
-
 def pipeline_sample = {
   stage("checkout") {
     checkout(scm)
@@ -110,6 +97,18 @@ if(env.CHANGE_ID) {
     )
   }
 }
+
+def stage_phase = [
+  [ name: 'configuration', description: 'i am configuration' ],
+  [ name: 'dependencies', description: 'i am dependencies' ],
+  [
+    [ name: 'workspace1', description: 'i am workspace one' ],
+    [ name: 'workspace2', description: 'i am workspace two' ],
+    [ name: 'workspace3', description: 'i am workspace three' ],
+  ],
+  [ name: 'build', description: 'i am build' ],
+  [ name: 'build', description: 'i am deployment' ]
+]
 
 if(env.CHANGE_ID) {
   runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase]) 
