@@ -17,7 +17,7 @@ def node_config = [
 ]
 
 def stage_phase = [
-  [ name: 'config', description: 'i am config' ],
+  [ name: 'configuration', description: 'i am configuration' ],
   [ name: 'dependencies', description: 'i am dependencies' ],
   [
     [ name: 'workspace1', description: 'i am workspace one' ],
