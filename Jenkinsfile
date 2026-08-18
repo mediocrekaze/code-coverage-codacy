@@ -8,7 +8,7 @@ def environment = [
   development: [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]    
 ]
 
-node_config = [
+def node_config = [
   podConfig : [
     cloud: 'demo',
     name: 'demo-pod',
@@ -16,7 +16,7 @@ node_config = [
   ]
 ]
 
-stage_phase = [
+def stage_phase = [
   [ name: 'config', description: 'i am config' ],
   [ name: 'dependencies', description: 'i am dependencies' ],
   [
@@ -112,5 +112,5 @@ if(env.CHANGE_ID) {
 }
 
 if(env.CHANGE_ID) {
-  runWithPod(pipeline_sample, node_config) 
+  runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase]) 
 }
