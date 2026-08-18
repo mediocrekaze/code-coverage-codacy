@@ -16,7 +16,79 @@ node_config = [
   ]
 ]
 
+stage_phase = [
+  [ name: 'config', description: 'i am config' ],
+  [ name: 'dependencies', description: 'i am dependencies' ],
+  [
+    [ name: 'workspace1', description: 'i am workspace one' ],
+    [ name: 'workspace2', description: 'i am workspace two' ],
+    [ name: 'workspace3', description: 'i am workspace three' ],
+  ],
+  [ name: 'build', description: 'i am build' ],
+  [ name: 'build', description: 'i am deployment' ]
+]
+
+
 def pipeline_sample = {
+  stage("checkout") {
+    checkout(scm)
+  }
+  try {
+    config.stage_phase.each { job ->
+      if(job instanceof ArrayList) {
+        job_dict = [:]
+        job.each { sub_job ->
+          job_dict[sub_job.name] = {
+            def stage_name = sub_job.name
+            stage(stage_name) {
+              echo " name: ${sub_job.name}, ${sub_job.description}"
+            }
+          }
+        }
+        parallel job_dict
+      }
+      else {
+        def stage_name = stage_phase.name
+        stage(stage_name) {
+          echo " name: ${sub_job.name}, ${sub_job.description}"
+        }
+      }
+    }
+  }
+  catch(e) {
+    stage("sleep phase") {
+      echo "i am sleeping"
+    }
+    throw e
+  }
+  finally {
+    stage("exit") {
+      echo "i will now exit"
+    }
+  }
+  //stage("build") {
+  //  parallel(
+  //    'Europe': {
+  //      stage('Deploy Europe') {
+  //        retry(2) {
+  //          echo "Deploying to Europe EKS..."
+  //          echo "Europe deployment finished"
+  //        }
+  //      }
+  //    },
+  //    'China': {
+  //      stage('Deploy China') {
+  //        retry(2) {
+  //          echo "Deploying to China EKS..."
+  //          echo "China deployment finished"
+  //        }
+  //      }
+  //    }
+  //  )
+  //}
+}
+
+if(env.CHANGE_ID) {
   stage("stage env") {
     echo "hello there!"
     echo "PR Number : ${pullRequest.number}"
@@ -35,29 +107,6 @@ def pipeline_sample = {
     runMe(
       name: 'mediocre',
       environment: 'infrastructure'
-    )
-  }
-  stage("checkout") {
-    checkout(scm)
-  }
-  stage("build") {
-    parallel(
-      'Europe': {
-        stage('Deploy Europe') {
-          retry(2) {
-            echo "Deploying to Europe EKS..."
-            echo "Europe deployment finished"
-          }
-        }
-      },
-      'China': {
-        stage('Deploy China') {
-          retry(2) {
-            echo "Deploying to China EKS..."
-            echo "China deployment finished"
-          }
-        }
-      }
     )
   }
 }
