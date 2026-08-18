@@ -8,11 +8,18 @@ def environment = [
   development: [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]    
 ]
 
+node_config = [
+  podConfig : [
+    cloud: 'demo',
+    name: 'demo-pod',
+    image: '487835535578.dkr.ecr.ap-southeast-1.amazonaws.com/build-image:latest'
+  ]
+]
+
 def pipeline_sample = {
   stage("checkout") {
     //checkout(scm)
   }
-
   stage("build") {
     parallel(
       'Europe': {
@@ -60,14 +67,5 @@ if(env.CHANGE_ID) {
 }
 
 if(env.CHANGE_ID) {
-  runWithPod(pipeline_sample, cloud: 'demo', container: 'builder') {
-    stage('pod test') {
-      sh 'echo "Hello from Jenkins Kubernetes agent"'
-      sh 'hostname'
-      sh 'cat /etc/os-release'      
-    }
-    stage('pod build') {
-      sh 'echo "running build"'
-    }
-  }
+  runWithPod(pipeline_sample, node_config) 
 }
