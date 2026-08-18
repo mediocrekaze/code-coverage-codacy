@@ -17,6 +17,26 @@ node_config = [
 ]
 
 def pipeline_sample = {
+  stage("stage env") {
+    echo "hello there!"
+    echo "PR Number : ${pullRequest.number}"
+    echo "Draft     : ${pullRequest.draft}"
+    if (pr_workspace_label in pullRequest.labels.collect { it }) {
+        echo "PR label ${pr_workspace_label} available"
+    }
+    echo "branch name      : ${env.BRANCH_NAME}"
+    echo "build number     : ${env.BUILD_NUMBER}"
+    echo "job name         : ${env.JOB_NAME}"
+    echo "workspace        : ${env.WORKSPACE}"
+    echo "pr number        : ${env.CHANGE_ID}"
+    echo "pr target branch : ${env.CHANGE_TARGET}"
+    echo "environment code : ${ env_code }"
+    echo "sample condition : ${ environment.development.env }"
+    runMe(
+      name: 'mediocre',
+      environment: 'infrastructure'
+    )
+  }
   stage("checkout") {
     //checkout(scm)
   }
@@ -40,30 +60,6 @@ def pipeline_sample = {
       }
     )
   }
-}
-
-if(env.CHANGE_ID) {
-  stage("stage env") {
-    echo "hello there!"
-    echo "PR Number : ${pullRequest.number}"
-    echo "Draft     : ${pullRequest.draft}"
-    if (pr_workspace_label in pullRequest.labels.collect { it }) {
-        echo "PR label ${pr_workspace_label} available"
-    }
-    echo "branch name      : ${env.BRANCH_NAME}"
-    echo "build number     : ${env.BUILD_NUMBER}"
-    echo "job name         : ${env.JOB_NAME}"
-    echo "workspace        : ${env.WORKSPACE}"
-    echo "pr number        : ${env.CHANGE_ID}"
-    echo "pr target branch : ${env.CHANGE_TARGET}"
-    echo "environment code : ${ env_code }"
-    echo "sample condition : ${ environment.development.env }"
-    runMe(
-      name: 'mediocre',
-      environment: 'infrastructure'
-    )
-  }
-  //pipeline_sample()
 }
 
 if(env.CHANGE_ID) {
