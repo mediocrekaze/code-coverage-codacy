@@ -35,9 +35,9 @@ def pipeline_sample = {
         parallel job_dict
       }
       else {
-        def stage_name = stage_phase.name
+        def stage_name = job.name
         stage(stage_name) {
-          echo " name: ${stage_phase.name}, ${stage_phase.description}"
+          echo " name: ${job.name}, ${job.description}"
         }
       }
     }
