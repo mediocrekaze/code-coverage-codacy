@@ -16,7 +16,7 @@ def node_config = [
   ]
 ]
 
-def pipeline_sample = {
+Closure pipeline_sample = { config ->
   stage("checkout") {
     checkout(scm)
   }
