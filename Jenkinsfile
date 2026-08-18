@@ -38,7 +38,7 @@ def pipeline_sample = {
     )
   }
   stage("checkout") {
-    //checkout(scm)
+    checkout(scm)
   }
   stage("build") {
     parallel(
