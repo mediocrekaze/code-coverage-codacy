@@ -56,11 +56,11 @@ if(env.CHANGE_ID) {
       environment: 'infrastructure'
     )
   }
-  pipeline_sample()
+  //pipeline_sample()
 }
 
 if(env.CHANGE_ID) {
-  runWithPod(cloud: 'demo', container: 'builder') {
+  runWithPod(pipeline_sample, cloud: 'demo', container: 'builder') {
     stage('pod test') {
       sh 'echo "Hello from Jenkins Kubernetes agent"'
       sh 'hostname'
