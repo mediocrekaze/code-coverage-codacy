@@ -50,7 +50,7 @@ def pipeline_sample = {
       else {
         def stage_name = stage_phase.name
         stage(stage_name) {
-          echo " name: ${sub_job.name}, ${sub_job.description}"
+          echo " name: ${stage_phase.name}, ${stage_phase.description}"
         }
       }
     }
