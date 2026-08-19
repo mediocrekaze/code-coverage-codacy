@@ -4,13 +4,14 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def pr_workspace_label = "workspace"
 
+def cloud = ""
+
 def environment = [
   development: [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]    
 ]
 
 def node_config = [
   podConfig : [
-    cloud: 'demo',
     name: 'demo-pod',
     image: '487835535578.dkr.ecr.ap-southeast-1.amazonaws.com/build-image:latest'
   ]
@@ -111,5 +112,14 @@ def stage_phase = [
 ]
 
 if(env.CHANGE_ID) {
-  runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase]) 
+  parallel(
+    'aws-com': {     
+      cloud = 'aws-com'
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: ${cloud}]) 
+    },
+    'aws-cnn': {
+      cloud = 'aws-cnn'
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: ${cloud}]) 
+    }
+  )
 }
