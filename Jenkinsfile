@@ -114,12 +114,10 @@ def stage_phase = [
 if(env.CHANGE_ID) {
   parallel(
     'aws-com': {     
-      cloud = 'aws-com'
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: ${cloud}]) 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-com']) 
     },
     'aws-cnn': {
-      cloud = 'aws-cnn'
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: ${cloud}]) 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-cnn']) 
     }
   )
 }
