@@ -20,10 +20,10 @@ def cloud = ""
 
 def environment = [
   pr:         [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
-  codacy-dev: [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
-  codacy-stg: [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
-  codacy-svc: [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
-  codacy-dem: [ transition: 'main', build: true, destroy: false, env:  merge: true, merge_args: ['-X ours'], env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  'codacy-stg': [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  'codacy-svc': [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  'codacy-dem': [ transition: 'main', build: true, destroy: false, env:  merge: true, merge_args: ['-X ours'], env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
   main:       [ transition: 'codacy-dev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]
 ]
 
