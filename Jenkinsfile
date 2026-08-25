@@ -135,12 +135,12 @@ def stage_phase = [
 if(env.CHANGE_ID) {
   parallel(
     'aws-com': {    
-      def environment = environment_euc1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-com']) 
+      //environment = environment_euc1 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-com', environment: environment_euc1 ]) 
     },
     'aws-cnn': {
-      def environment = environment_cnn1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-cnn']) 
+      //environment = environment_cnn1 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-cnn', environment = environment_cnn1 ]) 
     }
   )
 }
