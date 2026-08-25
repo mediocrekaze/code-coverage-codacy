@@ -46,7 +46,7 @@ Closure pipeline_sample = { config ->
           job_dict[sub_job.name] = {
             def stage_name = sub_job.name
             stage(stage_name) {
-              withEnv(environment) {
+              withEnv(config.environment) {
                 echo "running with environment: ${config.environment}"
                 sh '''
                   echo "ENV_CODE=$ENV_CODE"
