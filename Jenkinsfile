@@ -115,7 +115,7 @@ if(env.CHANGE_ID) {
     echo "pr number        : ${env.CHANGE_ID}"
     echo "pr target branch : ${env.CHANGE_TARGET}"
     echo "environment code : ${ env_code }"
-    echo "sample condition : ${ environment.codacy-dev.env }"
+    //echo "sample condition : ${ environment.'codacy-dev'.env }"
     runMe(
       name: 'mediocre',
       environment: 'infrastructure'
