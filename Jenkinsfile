@@ -47,8 +47,11 @@ Closure pipeline_sample = { config ->
             def stage_name = sub_job.name
             stage(stage_name) {
               withEnv(environment) {
-                echo "ENV_CODE = ${env.ENV_CODE}"
-                echo "AWS_CODE = ${env.AWS_CODE}"
+                echo "running with environment: ${config.environment}"
+                sh '''
+                  echo "ENV_CODE=$ENV_CODE"
+                  echo "AWS_CODE=$AWS_CODE"
+                '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
             }
