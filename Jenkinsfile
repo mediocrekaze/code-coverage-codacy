@@ -18,7 +18,7 @@ def pr_workspace_label = "workspace"
 
 def cloud = ""
 
-def environment = [
+def dev_environment = [
   pr:         [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
   'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
   'codacy-stg': [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
