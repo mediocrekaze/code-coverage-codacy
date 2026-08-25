@@ -140,7 +140,7 @@ if(env.CHANGE_ID) {
     },
     'aws-cnn': {
       //environment = environment_cnn1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-cnn', environment = environment_cnn1 ]) 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-cnn', environment: environment_cnn1 ]) 
     }
   )
 }
