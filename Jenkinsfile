@@ -2,12 +2,29 @@
 
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
+
+def environment_cnn1 = [
+  "ENV_CODE=cnn1",
+  "AWS_CODE=aws-cnn"
+]
+
+def environment_euc1 = [
+  "ENV_CODE=euc1",
+  "AWS_CODE=aws-com"
+]
+
+
 def pr_workspace_label = "workspace"
 
 def cloud = ""
 
 def environment = [
-  development: [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]    
+  pr:         [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  codacy-dev: [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  codacy-stg: [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  codacy-svc: [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  codacy-dem: [ transition: 'main', build: true, destroy: false, env:  merge: true, merge_args: ['-X ours'], env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  main:       [ transition: 'codacy-dev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]
 ]
 
 def node_config = [
@@ -29,6 +46,10 @@ Closure pipeline_sample = { config ->
           job_dict[sub_job.name] = {
             def stage_name = sub_job.name
             stage(stage_name) {
+              withEnv(environment) {
+                echo "ENV_CODE = ${env.ENV_CODE}"
+                echo "AWS_CODE = ${env.AWS_CODE}"
+              }
               echo " name: ${sub_job.name}, ${sub_job.description}"
             }
           }
@@ -113,10 +134,12 @@ def stage_phase = [
 
 if(env.CHANGE_ID) {
   parallel(
-    'aws-com': {     
+    'aws-com': {    
+      def environment = environment_euc1 
       runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-com']) 
     },
     'aws-cnn': {
+      def environment = environment_cnn1 
       runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'aws-cnn']) 
     }
   )
