@@ -13,31 +13,8 @@ def environment_euc1 = [
   "aws_code=aws-com"
 ]
 
-
 def pr_workspace_label = "workspace"
-
 def cloud = ""
-
-//def dev_environment = [
-//  pr:         [ build: true, destroy: false, env: 'aws-com' ],
-//  // 'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
-//  'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
-//  'codacy-stg': [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
-//  'codacy-svc': [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env:'aws-com' ],
-//  'codacy-dem': [ transition: 'main', build: true, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com' ],
-//  main:         [ transition: 'codacy-dev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com' ]
-//]
-
-def dev_environment = [
-  pr:         [ build: true, destroy: false, env: 'aws-com' ],
-  // 'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
-  'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
-  'codacy-stg': [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
-  'codacy-svc': [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env:'aws-com' ],
-  'codacy-dem': [ transition: 'main', build: true, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com' ],
-  main:         [ transition: 'codacy-dev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com' ]
-]
-
 def node_config = [
   podConfig : [
     name: 'demo-pod',
@@ -45,7 +22,7 @@ def node_config = [
   ]
 ]
 
-Closure pipeline_sample = { config ->
+Closure pipeline_infra = { config ->
   stage("checkout") {
     checkout(scm)
   }
@@ -89,28 +66,17 @@ Closure pipeline_sample = { config ->
       echo "i will now exit"
     }
   }
-  //stage("build") {
-  //  parallel(
-  //    'Europe': {
-  //      stage('Deploy Europe') {
-  //        retry(2) {
-  //          echo "Deploying to Europe EKS..."
-  //          echo "Europe deployment finished"
-  //        }
-  //      }
-  //    },
-  //    'China': {
-  //      stage('Deploy China') {
-  //        retry(2) {
-  //          echo "Deploying to China EKS..."
-  //          echo "China deployment finished"
-  //        }
-  //      }
-  //    }
-  //  )
-  //}
 }
 
+def dev_environments = [
+  workspace: [ build: true, destroy: false, env:'aws-com-dev-euc1' ],
+  pr:        [:],
+  codacydev: [ transition: 'codacystg', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-euc1' ],
+  codacystg: [ transition: 'codacysvc', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-main-euc1' ],
+  codacysvc: [ transition: 'codacydem', build: true, destroy: false,  merge: false, merge_args: [], env:'aws-com-svc-euc1' ],
+  codacydem: [ transition: 'main', build: true, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com-dev-dem-euc1' ],
+  main:      [ transition: 'codacydev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com-dev-main-euc1' ]
+]
 
 //dev_environment.pr: [ build: true, destroy: false, env: 'aws-com' ],
 
@@ -154,11 +120,11 @@ if(env.CHANGE_ID) {
   parallel(
     euc1: {    
       //environment = environment_euc1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'euc1', environment: environment_euc1 ]) 
+      runWithPod(pipeline_infra, node_config + [stage_phase: stage_phase, cloud: 'euc1', environment: environment_euc1 ]) 
     },
     cnn1: {
       //environment = environment_cnn1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'cnn1', environment: environment_cnn1 ]) 
+      runWithPod(pipeline_infra, node_config + [stage_phase: stage_phase, cloud: 'cnn1', environment: environment_cnn1 ]) 
     }
   )
 }
