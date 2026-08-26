@@ -78,7 +78,7 @@ def dev_environment = [
   main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com-dev-main-euc1' ]
 ]
 
-dev_environment.pr: [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ]
+dev_environment.pr = [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ]
 
 def branch = []
 def create_workspace = false
@@ -93,7 +93,7 @@ def gha_label = "gha"
 def pr_workspace_label_present = false
 
 if(env.CHANGE_ID) {
-  dev_environment.pr: [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1'],
+  dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1'],
   stage("stage env") {
     withEnv(environment_euc1) {
       if (pullRequest.draft) {
