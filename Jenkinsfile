@@ -154,11 +154,11 @@ if(env.CHANGE_ID) {
   parallel(
     'aws-com': {    
       //environment = environment_euc1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: euc1, environment: environment_euc1 ]) 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'euc1', environment: environment_euc1 ]) 
     },
     'aws-cnn': {
       //environment = environment_cnn1 
-      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: cnn1, environment: environment_cnn1 ]) 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'cnn1', environment: environment_cnn1 ]) 
     }
   )
 }
