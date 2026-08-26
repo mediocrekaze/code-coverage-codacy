@@ -2,15 +2,44 @@
 
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
+
+def environment_cnn1 = [
+  "env_code=cnn1",
+  "aws_code=aws-cnn"
+]
+
+def environment_euc1 = [
+  "env_code=euc1",
+  "aws_code=aws-com"
+]
+
+
 def pr_workspace_label = "workspace"
 
-def environment = [
-  development: [ build: true, destroy: false, env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ]    
+def cloud = ""
+
+//def dev_environment = [
+//  pr:         [ build: true, destroy: false, env: 'aws-com' ],
+//  // 'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+//  'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
+//  'codacy-stg': [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
+//  'codacy-svc': [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env:'aws-com' ],
+//  'codacy-dem': [ transition: 'main', build: true, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com' ],
+//  main:         [ transition: 'codacy-dev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com' ]
+//]
+
+def dev_environment = [
+  pr:         [ build: true, destroy: false, env: 'aws-com' ],
+  // 'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env: env_code == 'aws-com' ? 'aws-com' : 'aws-cnn' ],
+  'codacy-dev': [ transition: 'codacy-stg', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
+  'codacy-stg': [ transition: 'codacy-svc', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com' ],
+  'codacy-svc': [ transition: 'codacy-dem', build: true, destroy: false,  merge: false, merge_args: [], env:'aws-com' ],
+  'codacy-dem': [ transition: 'main', build: true, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com' ],
+  main:         [ transition: 'codacy-dev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com' ]
 ]
 
 def node_config = [
   podConfig : [
-    cloud: 'demo',
     name: 'demo-pod',
     image: '487835535578.dkr.ecr.ap-southeast-1.amazonaws.com/build-image:latest'
   ]
@@ -26,8 +55,15 @@ Closure pipeline_sample = { config ->
         job_dict = [:]
         job.each { sub_job ->
           job_dict[sub_job.name] = {
-            def stage_name = sub_job.name
+            def stage_name = config.cloud + " " + sub_job.name
             stage(stage_name) {
+              withEnv(config.environment) {
+                echo "running with environment: ${config.environment}"
+                sh '''
+                  echo "env_code=$env_code"
+                  echo "aws_code=$aws_code"
+                '''
+              }
               echo " name: ${sub_job.name}, ${sub_job.description}"
             }
           }
@@ -35,7 +71,7 @@ Closure pipeline_sample = { config ->
         parallel job_dict
       }
       else {
-        def stage_name = job.name
+        def stage_name = config.cloud + " " + job.name
         stage(stage_name) {
           echo " name: ${job.name}, ${job.description}"
         }
@@ -75,7 +111,11 @@ Closure pipeline_sample = { config ->
   //}
 }
 
+
+//dev_environment.pr: [ build: true, destroy: false, env: 'aws-com' ],
+
 if(env.CHANGE_ID) {
+  //dev_environment.pr: [ build: true, destroy: false, env: pullRequest.draft? 'aws-com-development-euc1' : 'aws-com-development-jenkins-euc1'],
   stage("stage env") {
     echo "hello there!"
     echo "PR Number : ${pullRequest.number}"
@@ -89,8 +129,8 @@ if(env.CHANGE_ID) {
     echo "workspace        : ${env.WORKSPACE}"
     echo "pr number        : ${env.CHANGE_ID}"
     echo "pr target branch : ${env.CHANGE_TARGET}"
-    echo "environment code : ${ env_code }"
-    echo "sample condition : ${ environment.development.env }"
+    echo "environment code : ${ ENV_GLOBAL }"  // environment variable declared in jenkins system / global properties
+    //echo "sample condition : ${ environment.'codacy-dev'.env }"
     runMe(
       name: 'mediocre',
       environment: 'infrastructure'
@@ -111,5 +151,14 @@ def stage_phase = [
 ]
 
 if(env.CHANGE_ID) {
-  runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase]) 
+  parallel(
+    euc1: {    
+      //environment = environment_euc1 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'euc1', environment: environment_euc1 ]) 
+    },
+    cnn1: {
+      //environment = environment_cnn1 
+      runWithPod(pipeline_sample, node_config + [stage_phase: stage_phase, cloud: 'cnn1', environment: environment_cnn1 ]) 
+    }
+  )
 }
