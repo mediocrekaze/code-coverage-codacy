@@ -3,14 +3,14 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 
-def environment_cnn1 = [
-  "env_code=cnn1",
-  "aws_code=aws-cnn"
-]
-
 def environment_euc1 = [
   "env_code=euc1",
   "aws_code=aws-com"
+]
+
+def environment_cnn1 = [
+  "env_code=cnn1",
+  "aws_code=aws-cnn"
 ]
 
 def pr_workspace_label = "workspace"
@@ -69,20 +69,39 @@ Closure pipeline_infra = { config ->
 }
 
 def dev_environments = [
-  workspace: [ build: true, destroy: false, env:'aws-com-dev-euc1' ],
+  workspace: [ build: true, test: false, destroy: false, env:'aws-com-dev-euc1' ],
   pr:        [:],
-  codacydev: [ transition: 'codacystg', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-euc1' ],
-  codacystg: [ transition: 'codacysvc', build: true, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-main-euc1' ],
-  codacysvc: [ transition: 'codacydem', build: true, destroy: false,  merge: false, merge_args: [], env:'aws-com-svc-euc1' ],
-  codacydem: [ transition: 'main', build: true, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com-dev-dem-euc1' ],
-  main:      [ transition: 'codacydev', build: true, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com-dev-main-euc1' ]
+  codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-euc1' ],
+  codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-main-euc1' ],
+  codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:'aws-com-svc-euc1' ],
+  codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com-dev-dem-euc1' ],
+  main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com-dev-main-euc1' ]
 ]
 
-//dev_environment.pr: [ build: true, destroy: false, env: 'aws-com' ],
+dev_environment.pr: [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ],
+
+def branch = []
+def create_workspace = false
+def pr_id = false
+def pr_changed_files = ["hello"]
+def plan_only = true
+def destroy = false
+def run_test = false
+def workspace
+def pr_workspace_label = "workspace"
+def gha_label = "gha"
+def pr_workspace_label_present = false
 
 if(env.CHANGE_ID) {
-  //dev_environment.pr: [ build: true, destroy: false, env: pullRequest.draft? 'aws-com-development-euc1' : 'aws-com-development-jenkins-euc1'],
+  dev_environment.pr: [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1'],
   stage("stage env") {
+    withEnv(environment_euc1) {
+      if (pullRequest.draft) {
+        echo "i am a draft"
+      } else {
+        echo "i am not a draft"
+      }
+    }
     echo "hello there!"
     echo "PR Number : ${pullRequest.number}"
     echo "Draft     : ${pullRequest.draft}"
@@ -95,12 +114,27 @@ if(env.CHANGE_ID) {
     echo "workspace        : ${env.WORKSPACE}"
     echo "pr number        : ${env.CHANGE_ID}"
     echo "pr target branch : ${env.CHANGE_TARGET}"
+    echo "pr target branch : ${pullRequest.getBase()}"
     echo "environment code : ${ ENV_GLOBAL }"  // environment variable declared in jenkins system / global properties
-    //echo "sample condition : ${ environment.'codacy-dev'.env }"
     runMe(
       name: 'mediocre',
       environment: 'infrastructure'
     )
+  }
+  if (!(pullRequest.getBase() ==~ 'production/.*')) {
+
+    if (gha_label in pullRequest.labels.collect {it}) {
+      echo "PR Label \"${gha_label}\" available. PR"
+      return
+    }
+
+    if (pr_workspace_label in pullRequest.labels.collect {it}) {
+      echo "PR LABEL \"${pr_workspace_label}\" available. workspace will be created"
+    } else {
+      echo "PR LABEL \"${pr_workspace_label}\" not available. pipeline will stop"
+      currentBuild.result 'SUCCESS'
+      return
+    }
   }
 }
 
