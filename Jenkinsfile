@@ -55,7 +55,8 @@ Closure pipeline_sample = { config ->
         job_dict = [:]
         job.each { sub_job ->
           job_dict[sub_job.name] = {
-            def stage_name = config.environment.aws_code + " " + sub_job.name
+            def name_env = config.environment.aws_code
+            def stage_name = name_env + " " + sub_job.name
             stage(stage_name) {
               withEnv(config.environment) {
                 echo "running with environment: ${config.environment}"
