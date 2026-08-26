@@ -131,7 +131,7 @@ if(env.CHANGE_ID) {
       echo "PR LABEL \"${pr_workspace_label}\" available. workspace will be created"
     } else {
       echo "PR LABEL \"${pr_workspace_label}\" not available. pipeline will stop"
-      currentBuild.result 'SUCCESS'
+      currentBuild.result = 'SUCCESS'
       return
     }
   }
