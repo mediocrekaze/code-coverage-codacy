@@ -60,8 +60,8 @@ Closure pipeline_sample = { config ->
               withEnv(config.environment) {
                 echo "running with environment: ${config.environment}"
                 sh '''
-                  echo "ENV_CODE=$ENV_CODE"
-                  echo "AWS_CODE=$AWS_CODE"
+                  echo "env_code=$env_code"
+                  echo "aws_code=$aws_code"
                 '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
