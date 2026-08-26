@@ -71,7 +71,7 @@ Closure pipeline_sample = { config ->
         parallel job_dict
       }
       else {
-        def stage_name = job.name
+        def stage_name = config.cloud + " " + job.name
         stage(stage_name) {
           echo " name: ${job.name}, ${job.description}"
         }
