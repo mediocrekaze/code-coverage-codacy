@@ -13,7 +13,6 @@ def environment_cnn1 = [
   "aws_code=aws-cnn"
 ]
 
-def pr_workspace_label = "workspace"
 def cloud = ""
 def node_config = [
   podConfig : [
