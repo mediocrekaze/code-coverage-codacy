@@ -101,24 +101,6 @@ if(env.CHANGE_ID) {
         echo "i am not a draft"
       }
     }
-    echo "hello there!"
-    echo "PR Number : ${pullRequest.number}"
-    echo "Draft     : ${pullRequest.draft}"
-    if (pr_workspace_label in pullRequest.labels.collect { it }) {
-        echo "PR label ${pr_workspace_label} available"
-    }
-    echo "branch name      : ${env.BRANCH_NAME}"
-    echo "build number     : ${env.BUILD_NUMBER}"
-    echo "job name         : ${env.JOB_NAME}"
-    echo "workspace        : ${env.WORKSPACE}"
-    echo "pr number        : ${env.CHANGE_ID}"
-    echo "pr target branch : ${env.CHANGE_TARGET}"
-    echo "pr target branch : ${pullRequest.getBase()}"
-    echo "environment code : ${ ENV_GLOBAL }"  // environment variable declared in jenkins system / global properties
-    runMe(
-      name: 'mediocre',
-      environment: 'infrastructure'
-    )
   }
   if (!(pullRequest.getBase() ==~ 'production/.*')) {
 
@@ -135,6 +117,43 @@ if(env.CHANGE_ID) {
       return
     }
   }
+
+  branch = [ env.CHANGE_TARGET ]
+  workspace = env.CHANGE_TARGET
+  
+  if (workspace == 'development') {
+    create_workspace = true
+    pr_changed_files = pullRequest.files.collect {
+      it.getFilename()
+    }
+  }
+
+  if (env.CHANGE_TARGET.startsWith('production/')) {
+    branch = env.CHANGE_TARGET.tokenize('/')
+  }
+
+  pr_id = env.CHANGE_ID
+  plan_only = true
+
+  echo "PR Number : ${pullRequest.number}"
+  echo "Draft     : ${pullRequest.draft}"
+  if (pr_workspace_label in pullRequest.labels.collect { it }) {
+      echo "PR label ${pr_workspace_label} available"
+  }
+  echo "branch name      : ${env.BRANCH_NAME}"
+  echo "build number     : ${env.BUILD_NUMBER}"
+  echo "job name         : ${env.JOB_NAME}"
+  echo "workspace        : ${env.WORKSPACE}"
+  echo "pr number        : ${env.CHANGE_ID}"
+  echo "pr target branch : ${env.CHANGE_TARGET}"
+  echo "pr target branch : ${pullRequest.getBase()}"
+  echo "environment code : ${ ENV_GLOBAL }"  // environment variable declared in jenkins system / global properties
+  runMe(
+    name: 'mediocre',
+    environment: 'infrastructure'
+  )
+
+
 }
 
 def stage_phase = [
