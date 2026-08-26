@@ -68,7 +68,7 @@ Closure pipeline_infra = { config ->
   }
 }
 
-def dev_environments = [
+def dev_environment = [
   workspace: [ build: true, test: false, destroy: false, env:'aws-com-dev-euc1' ],
   pr:        [:],
   codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-euc1' ],
@@ -78,7 +78,7 @@ def dev_environments = [
   main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com-dev-main-euc1' ]
 ]
 
-dev_environment.pr: [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ],
+dev_environment.pr: [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ]
 
 def branch = []
 def create_workspace = false
