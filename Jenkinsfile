@@ -22,7 +22,7 @@ def node_config = [
 ]
 
 Closure pipeline_infra = { config ->
-  stage("checkout") {
+  stage(config.cloud + " " + "checkout") {
     checkout(scm)
   }
   try {
