@@ -33,10 +33,10 @@ Closure pipeline_infra = { config ->
           job_dict[sub_job.name] = {
             def stage_name = config.cloud + " " + sub_job.name
             stage(stage_name) {
-              withEnv(config.environment) {
+              withEnv(config.environment + ["STAGE_NAME=${sub_job.name}"]) {
                 echo "running with environment: ${config.environment}"
                 sh '''
-                  echo "env_code=\$env_code aws_code=\$aws_code description='${sub_job.description}'" >> env.txt
+                  echo "env_code=$env_code aws_code=$aws_code stage_name='$STAGE_NAME'" >> env.txt
                 '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
