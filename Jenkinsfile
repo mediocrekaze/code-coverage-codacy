@@ -229,40 +229,41 @@ if (dev_environment.containsKey(branch[0])) {
     stage_phases += stage_not_pr
   }
 
-}
-
-if (dev_environment[branch[0]].build || pr_workspace_label_present) {
-  if (plan_only) {
-    if (create_workspace)
-      try {
-        parallel(
-          euc1: {    
-            //environment = environment_euc1 
-            runWithPod(
-              pipeline_infra,
-              node_config + [
-                stage_phases: stage_phases,
-                cloud: 'euc1',
-                environment: environment_euc1
-              ]
-            ) 
-          },
-          cnn1: {
-            //environment = environment_cnn1 
-            runWithPod(
-              pipeline_infra,
-              node_config + [
-                stage_phases: stage_phases,
-                cloud: 'cnn1',
-                environment: environment_cnn1
-              ]
-            ) 
-          }
-        )        
-      } catch(e) {
-          throw e
-      }
+  if (dev_environment[branch[0]].build || pr_workspace_label_present) {
+    if (plan_only) {
+      if (create_workspace)
+        try {
+          parallel(
+            euc1: {    
+              //environment = environment_euc1 
+              runWithPod(
+                pipeline_infra,
+                node_config + [
+                  stage_phases: stage_phases,
+                  cloud: 'euc1',
+                  environment: environment_euc1
+                ]
+              ) 
+            },
+            cnn1: {
+              //environment = environment_cnn1 
+              runWithPod(
+                pipeline_infra,
+                node_config + [
+                  stage_phases: stage_phases,
+                  cloud: 'cnn1',
+                  environment: environment_cnn1
+                ]
+              ) 
+            }
+          )        
+        } catch(e) {
+            throw e
+        }
+    }
   }
+
+
 }
 
 //if(env.CHANGE_ID) {
