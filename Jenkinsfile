@@ -185,6 +185,15 @@ else {
   }
 }
 
+echo "DEBUG branch = ${branch}"
+echo "DEBUG branch[0] = ${branch[0]}"
+echo "DEBUG dev_environment contains branch = ${dev_environment.containsKey(branch[0])}"
+echo "DEBUG build = ${dev_environment[branch[0]]?.build}"
+echo "DEBUG plan_only = ${plan_only}"
+echo "DEBUG create_workspace = ${create_workspace}"
+echo "DEBUG pr_workspace_label_present = ${pr_workspace_label_present}"
+
+
 if (dev_environment.containsKey(branch[0])) {
   def stage_prepare = [
     [ name: 'configuration', description: 'i am configuration on a non-production phase' ],
