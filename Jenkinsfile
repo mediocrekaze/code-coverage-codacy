@@ -26,7 +26,7 @@ Closure pipeline_infra = { config ->
     checkout(scm)
   }
   try {
-    config.stage_phase.each { job ->
+    config.stage_phases.each { job ->
       if(job instanceof ArrayList) {
         job_dict = [:]
         job.each { sub_job ->
@@ -152,31 +152,128 @@ if(env.CHANGE_ID) {
     name: 'mediocre',
     environment: 'infrastructure'
   )
-
-
 }
 
-def stage_phase = [
-  [ name: 'configuration', description: 'i am configuration' ],
-  [ name: 'dependencies', description: 'i am dependencies' ],
-  [
-    [ name: 'workspace1', description: 'i am workspace one' ],
-    [ name: 'workspace2', description: 'i am workspace two' ],
-    [ name: 'workspace3', description: 'i am workspace three' ],
-  ],
-  [ name: 'build', description: 'i am build' ],
-  [ name: 'deployment', description: 'i am deployment' ]
-]
+else {
+  branch = env.BRANCH_NAME.tokenize('/')
+  pr_id = false
+  workspace = branch[0]
 
-if(env.CHANGE_ID) {
-  parallel(
-    euc1: {    
-      //environment = environment_euc1 
-      runWithPod(pipeline_infra, node_config + [stage_phase: stage_phase, cloud: 'euc1', environment: environment_euc1 ]) 
-    },
-    cnn1: {
-      //environment = environment_cnn1 
-      runWithPod(pipeline_infra, node_config + [stage_phase: stage_phase, cloud: 'cnn1', environment: environment_cnn1 ]) 
+  if (dev_environment.containsKey( branch[0] )) {
+    plan_only = false
+    if (!dev_environment[branch[0]].isEmpty()) {
+      destroy = dev_environment[branch[0]]['destroy']
+      run_test = dev_environment[branch[0]]['test']
     }
-  )
+    if (branch[0] == 'workspace') {
+      workspace = branch[1..-1].join("-").toLowerCase().replaceAll("_","-")
+    }
+    if (!(workspace ==~ "(?=.{3,20}\$)(?!-)(?!.*--)[a-z0-9-]+(?<!-)") || dev_environment.containsKey(workspace)) {
+      error("invalid workspace name")
+    }
+  }
+  else if (branch[0] == 'production') {
+    plan_only = false
+  }
+  else if (branch[0] == 'release') {}
+  else if (branch[0] == 'main') {}
+
+  else {
+    branch = [ 'development' ]
+    workspace = "development"
+    plan_only = true
+  }
 }
+
+if (dev_environment.containsKey(branch[0])) {
+  def stage_prepare = [
+    [ name: 'configuration', description: 'i am configuration on a non-production phase' ],
+    [
+      [ name: 'workspace1', description: 'i am workspace one on a non-production phase' ],
+      [ name: 'workspace2', description: 'i am workspace two on a non-production phase' ],
+      [ name: 'workspace3', description: 'i am workspace three on a non-production phase' ],
+    ],
+    [ name: 'dependencies', description: 'i am dependencies on a non-production phase' ]
+  ]
+  def stage_construct = [
+    [ name: 'build', description: 'i am build on a non-production phase' ],
+    [ name: 'deployment', description: 'i am deployment on a non-production phase' ]
+  ]
+  def stage_finalize = [
+    [ name: 'backup', description: 'i am backup on a non-production phase' ],
+    [ name: 'report', description: 'i am report on a non-production phase' ]
+  ]
+  def stage_not_pr = [
+    [ name: 'not_pr', description: 'i am not pr on a non-production phase' ]
+  ]
+
+  def stage_phases = []
+
+  if (env.CHANGE_ID) {
+    if (pullRequest.draft) {
+      println("PR is draft")
+      stage_phases += stage_prepare
+    } else {
+      print("PR is not draft")
+      stage_phases += stage_prepare
+      stage_phases += [
+        stage_construct + stage_finalize
+      ]
+    }
+  } else {
+    println("We are not on a PR")
+    stage_phases += stage_prepare
+    stage_phases += [
+      stage_construct + stage_finalize
+    ]
+    stage_phases += stage_not_pr
+  }
+
+}
+
+if (dev_environment[branch[0]].build || pr_workspace_label_present) {
+  if (plan_only) {
+    if (create_workspace)
+      try {
+        parallel(
+          euc1: {    
+            //environment = environment_euc1 
+            runWithPod(
+              pipeline_infra,
+              node_config + [
+                stage_phases: stage_phases,
+                cloud: 'euc1',
+                environment: environment_euc1
+              ]
+            ) 
+          },
+          cnn1: {
+            //environment = environment_cnn1 
+            runWithPod(
+              pipeline_infra,
+              node_config + [
+                stage_phases: stage_phases,
+                cloud: 'cnn1',
+                environment: environment_cnn1
+              ]
+            ) 
+          }
+        )        
+      } catch(e) {
+          throw e
+      }
+  }
+}
+
+//if(env.CHANGE_ID) {
+//  parallel(
+//    euc1: {    
+//      //environment = environment_euc1 
+//      runWithPod(pipeline_infra, node_config + [stage_phase: stage_phase, cloud: 'euc1', environment: environment_euc1 ]) 
+//    },
+//    cnn1: {
+//      //environment = environment_cnn1 
+//      runWithPod(pipeline_infra, node_config + [stage_phase: stage_phase, cloud: 'cnn1', environment: environment_cnn1 ]) 
+//    }
+//  )
+//}
