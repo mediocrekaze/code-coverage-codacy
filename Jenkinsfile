@@ -208,10 +208,17 @@ if (dev_environment.containsKey(branch[0])) {
     [ name: 'build', description: 'i am build on a non-production phase' ],
     [ name: 'deployment', description: 'i am deployment on a non-production phase' ]
   ]
-  def stage_finalize = [
-    [ name: 'backup', description: 'i am backup on a non-production phase' ],
-    [ name: 'report', description: 'i am report on a non-production phase' ]
+  def stage_codetest = [
+    [ name: 'test_code', description: 'i am test_code on a non-production phase' ],
+    [ name: 'test_output', description: 'i am test_output on a non-production phase' ]
   ]
+  def stage_finalize = [
+    [ name: 'user_acceptance', description: 'i am user_acceptance on a non-production phase' ],
+    [ name: 'backup', description: 'i am backup on a non-production phase' ],
+  ]
+  def stage_report = [
+    [ name: 'report', description: 'i am report on a non-production phase' ]
+  ]  
   def stage_not_pr = [
     [ name: 'not_pr', description: 'i am not pr on a non-production phase' ]
   ]
@@ -222,11 +229,13 @@ if (dev_environment.containsKey(branch[0])) {
     if (pullRequest.draft) {
       println("PR is draft")
       stage_phases += stage_prepare
+      stage_phases += stage_construct
     } else {
       print("PR is not draft")
       stage_phases += stage_prepare
       stage_phases += [
-        stage_construct + stage_finalize
+        stage_construct + stage_codetest,
+        stage_finalize + stage_report
       ]
     }
   } else {
