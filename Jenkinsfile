@@ -252,7 +252,6 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc1: {    
-              //environment = environment_euc1 
               runWithPod(
                 pipeline_infra,
                 node_config + [
@@ -263,7 +262,6 @@ if (dev_environment.containsKey(branch[0])) {
               ) 
             },
             cnn1: {
-              //environment = environment_cnn1 
               runWithPod(
                 pipeline_infra,
                 node_config + [
@@ -275,6 +273,33 @@ if (dev_environment.containsKey(branch[0])) {
             }
           )        
         } catch(e) {
+            throw e
+        }
+    } else {
+        try {
+          parallel(
+            euc1: {    
+              runWithPod(
+                pipeline_infra,
+                node_config + [
+                  stage_phases: stage_phases,
+                  cloud: 'euc1',
+                  environment: environment_euc1
+                ]
+              ) 
+            },
+            cnn1: {
+              runWithPod(
+                pipeline_infra,
+                node_config + [
+                  stage_phases: stage_phases,
+                  cloud: 'cnn1',
+                  environment: environment_cnn1
+                ]
+              ) 
+            }
+          )          
+        } catch (e) {
             throw e
         }
     }
