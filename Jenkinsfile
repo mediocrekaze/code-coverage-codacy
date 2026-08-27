@@ -304,8 +304,21 @@ if (dev_environment.containsKey(branch[0])) {
         }
     }
   }
-
-
+  if (pr_id == false && plan_only == false && dev_environment[branch[0]].containsKey('transition')) {
+    if (dev_environment[branch[0]].merge)
+      runWithPod(merge, [
+        source: branch[0],
+        destination: dev_environment[branch[0]].transition,
+        force: dev_environment[branch[0]].force,
+        merge_args: dev_environment[branch[0]].merge_args
+      ])
+    else
+      runWithPod(fast_forward, [
+        source: branch[0],
+        destination: dev_environment[branch[0]].transition,
+        force: dev_environment[branch[0]].force
+      ])      
+  }
 }
 
 //if(env.CHANGE_ID) {
