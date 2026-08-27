@@ -121,7 +121,7 @@ if(env.CHANGE_ID) {
   branch = [ env.CHANGE_TARGET ]
   workspace = env.CHANGE_TARGET
   
-  if (workspace == 'development') {
+  if (workspace == 'codacydev') {
     create_workspace = true
     pr_changed_files = pullRequest.files.collect {
       it.getFilename()
@@ -185,13 +185,13 @@ else {
   }
 }
 
-echo "DEBUG branch = ${branch}"
-echo "DEBUG branch[0] = ${branch[0]}"
-echo "DEBUG dev_environment contains branch = ${dev_environment.containsKey(branch[0])}"
-echo "DEBUG build = ${dev_environment[branch[0]]?.build}"
-echo "DEBUG plan_only = ${plan_only}"
-echo "DEBUG create_workspace = ${create_workspace}"
-echo "DEBUG pr_workspace_label_present = ${pr_workspace_label_present}"
+//echo "DEBUG branch = ${branch}"
+//echo "DEBUG branch[0] = ${branch[0]}"
+//echo "DEBUG dev_environment contains branch = ${dev_environment.containsKey(branch[0])}"
+//echo "DEBUG build = ${dev_environment[branch[0]]?.build}"
+//echo "DEBUG plan_only = ${plan_only}"
+//echo "DEBUG create_workspace = ${create_workspace}"
+//echo "DEBUG pr_workspace_label_present = ${pr_workspace_label_present}"
 
 
 if (dev_environment.containsKey(branch[0])) {
