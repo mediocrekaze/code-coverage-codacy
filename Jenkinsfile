@@ -36,7 +36,7 @@ Closure pipeline_infra = { config ->
               withEnv(config.environment) {
                 echo "running with environment: ${config.environment}"
                 sh '''
-                  echo "TEST env_code=$env_code aws_code=$aws_code" >> env.txt
+                  echo "env_code=\$env_code aws_code=\$aws_code description='${sub_job.description}'" >> env.txt
                 '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
