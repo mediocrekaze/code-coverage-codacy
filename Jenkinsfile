@@ -35,8 +35,9 @@ Closure pipeline_infra = { config ->
             stage(stage_name) {
               withEnv(config.environment) {
                 echo "running with environment: ${config.environment}"
+                def env_info = "env_code=${env.env_code} aws_code=${env.aws_code} description='${sub_job.description}'"
                 sh '''
-                  echo "env_code=\$env_code aws_code=\$aws_code description='${sub_job.description}'" >> env.txt
+                  echo "${env_info}" >> env.txt
                 '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
