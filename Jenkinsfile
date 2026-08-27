@@ -321,6 +321,42 @@ if (dev_environment.containsKey(branch[0])) {
   }
 }
 
+else if (branch[0] == 'production') {
+  def stage_phases = [:]
+  def plan_phase = [:]
+  def env = ''
+  workspace = 'production'
+
+  if (branch[1] == 'auth') {
+    stage_phases = [
+      [ name: 'configuration', description: 'i am configuration on a production phase' ],
+      [ name: 'workspace', description: 'i am workspace one on a production phase' ],
+      [ name: 'dependencies', description: 'i am dependencies on a production phase' ]
+    ]
+    plan_phase = [
+      [ name: 'configuration', description: 'i am configuration on a production phase' ],
+      [ name: 'workspace', description: 'i am workspace one on a production phase' ],
+      [ name: 'dependencies', description: 'i am dependencies on a production phase' ]
+    ]
+    env = "aws-com-key-euc1"
+  } else {
+    stage_phases = [
+      [ name: 'configuration', description: 'i am configuration on a production phase' ],
+      [ name: 'workspace', description: 'i am workspace one on a production phase' ],
+      [ name: 'dependencies', description: 'i am dependencies on a production phase' ]
+    ]
+    plan_phase = [
+      [ name: 'configuration', description: 'i am configuration on a production phase' ],
+      [ name: 'workspace', description: 'i am workspace one on a production phase' ],
+      [ name: 'dependencies', description: 'i am dependencies on a production phase' ]
+    ]
+    env = "aws-com-${branch[1]}-euc1".toString()
+  }
+
+
+}
+
+
 //if(env.CHANGE_ID) {
 //  parallel(
 //    euc1: {    
