@@ -98,7 +98,7 @@ def pr_workspace_label_present = false
 if(env.CHANGE_ID) {
   dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1' ]
   stage("stage env") {
-    withEnv(environment_euc1) {
+    withEnv(environment_euc) {
       if (pullRequest.draft) {
         echo "i am a draft"
       } else {
@@ -115,6 +115,7 @@ if(env.CHANGE_ID) {
 
     if (pr_workspace_label in pullRequest.labels.collect {it}) {
       echo "PR LABEL \"${pr_workspace_label}\" available. workspace will be created"
+      pr_workspace_label_present = true
     } else {
       echo "PR LABEL \"${pr_workspace_label}\" not available. pipeline will stop"
       currentBuild.result = 'SUCCESS'
