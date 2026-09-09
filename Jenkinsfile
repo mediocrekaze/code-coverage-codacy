@@ -79,7 +79,8 @@ def dev_environment_backup = [
   main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'euc-dev-main' ]
 ]
 
-def dev_environment = { String cloud, boolean isDraft = false ->
+def dev_environment = { config, boolean isDraft = false ->
+  def cloud = config.cloud
   [
     workspace: [ build: true, test: false, destroy: false, env:"${cloud}-dev" ],
     pr:        [ build: true, test: false, destroy: true, env: isDraft? "${cloud}-dev" : "${cloud}-dev-jenkins" ],
