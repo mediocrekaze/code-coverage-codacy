@@ -21,8 +21,8 @@ def node_config = [
   ]
 ]
 
-def node_config_euc = []
-def node_config_cnn = []
+def node_config_euc = [:]
+def node_config_cnn = [:]
 
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
