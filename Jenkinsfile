@@ -79,20 +79,17 @@ def dev_environment_backup = [
   main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'euc-dev-main' ]
 ]
 
-def dev_environment = { config, boolean isDraft = false ->
-  cloud = config.cloud
-  [
-    workspace: [ build: true, test: false, destroy: false, env:"${cloud}-dev" ],
-    pr:        [ build: true, test: false, destroy: true, env: isDraft? "${cloud}-dev" : "${cloud}-dev-jenkins" ],
-    codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:"${cloud}-dev" ],
-    codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:"${cloud}-dev-main" ],
-    codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:"${cloud}-svc" ],
-    codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:"${cloud}-dev-dem" ],
-    main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:"${cloud}-dev-main" ]
+def dev_environment = [
+    workspace: [ build: true, test: false, destroy: false, env:'ENV_CODE-dev' ],
+    pr:        [:],
+    codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'ENV_CODE-dev' ],
+    codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:'ENV_CODE-dev-main' ],
+    codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:'ENV_CODE-svc' ],
+    codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:'ENV_CODE-dev-dem' ],
+    main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'ENV_CODE-dev-main' ]
   ]
-}
 
-//dev_environment.pr = [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ]
+dev_environment.pr = [ build: true, test: false, destroy: true, env: 'ENV_CODE-dev-jenkins' ]
 
 def branch = []
 def create_workspace = false
@@ -109,7 +106,7 @@ def pr_workspace_label_present = false
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // pull request
 if(env.CHANGE_ID) {
-  //dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1' ]
+  dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'ENV_CODE-dev' : 'ENV_CODE-dev-jenkins' ]
   stage("stage env") {
     withEnv(environment_euc) {
       if (pullRequest.draft) {
@@ -267,25 +264,23 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc: {
-              def isDraft = env.CHANGE_ID ? pullRequest.draft : false
               runWithPod(                              
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'euc',
-                  config_name: dev_environment('euc', isDraft)['pr'].env,
+                  config_name: dev_environment['pr'].env.replace('ENV_CODE', 'euc'),
                   environment: environment_euc
                 ]
               )
             },
             cnn: {
-              def isDraft = env.CHANGE_ID ? pullRequest.draft : false
               runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'cnn',
-                  config_name: dev_environment('cnn', isDraft)['pr'].env,
+                  config_name: dev_environment['pr'].env.replace('ENV_CODE', 'cnn'),
                   environment: environment_cnn
                 ]
               )
