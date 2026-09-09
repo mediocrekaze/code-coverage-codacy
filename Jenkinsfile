@@ -80,7 +80,7 @@ def dev_environment_backup = [
 ]
 
 def dev_environment = { config, boolean isDraft = false ->
-  def cloud = config.cloud
+  cloud = config.cloud
   [
     workspace: [ build: true, test: false, destroy: false, env:"${cloud}-dev" ],
     pr:        [ build: true, test: false, destroy: true, env: isDraft? "${cloud}-dev" : "${cloud}-dev-jenkins" ],
