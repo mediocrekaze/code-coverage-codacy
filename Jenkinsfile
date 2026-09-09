@@ -39,7 +39,7 @@ Closure pipeline_infra = { config ->
               withEnv(config.environment + ["STAGE_NAME=${sub_job.name}"]) {
                 echo "running with environment: ${config.environment}"
                 sh '''
-                  echo "env_code=$env_code aws_code=$aws_code stage_name='$STAGE_NAME'" >> env.txt
+                  echo "env_code=$env_code    aws_code=$aws_code    stage_name='$STAGE_NAME'   config_name='$config_name'"   >> env.txt
                 '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
@@ -69,17 +69,29 @@ Closure pipeline_infra = { config ->
   }
 }
 
-def dev_environment = [
-  workspace: [ build: true, test: false, destroy: false, env:'aws-com-dev-euc1' ],
+def dev_environment_backup = [
+  workspace: [ build: true, test: false, destroy: false, env:'euc-dev' ],
   pr:        [:],
-  codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-euc1' ],
-  codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:'aws-com-dev-main-euc1' ],
-  codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:'aws-com-svc-euc1' ],
-  codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:'aws-com-dev-dem-euc1' ],
-  main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'aws-com-dev-main-euc1' ]
+  codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'euc-dev' ],
+  codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:'euc-dev-main' ],
+  codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:'euc-svc' ],
+  codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:'euc-dev-dem' ],
+  main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'euc-dev-main' ]
 ]
 
-dev_environment.pr = [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ]
+def dev_environment = { String cloud, boolean isDraft = false ->
+  [
+    workspace: [ build: true, test: false, destroy: false, env:"${cloud}-dev" ],
+    pr:        [ build: true, test: false, destroy: true, env: isDraft? "${cloud}-dev" : "${cloud}-dev-jenkins" ],
+    codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:"${cloud}-dev" ],
+    codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:"${cloud}-dev-main" ],
+    codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:"${cloud}-svc" ],
+    codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:"${cloud}-dev-dem" ],
+    main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:"${cloud}-dev-main" ]
+  ]
+}
+
+//dev_environment.pr = [ build: true, test: false, destroy: true, env: 'aws-com-dev-jenkins-euc1' ]
 
 def branch = []
 def create_workspace = false
@@ -96,7 +108,7 @@ def pr_workspace_label_present = false
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // pull request
 if(env.CHANGE_ID) {
-  dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1' ]
+  //dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1' ]
   stage("stage env") {
     withEnv(environment_euc) {
       if (pullRequest.draft) {
@@ -253,25 +265,29 @@ if (dev_environment.containsKey(branch[0])) {
       if (create_workspace)
         try {
           parallel(
-            euc: {    
+            euc: {
+              def isDraft = env.CHANGE_ID ? pullRequest.draft : false
               runWithPod(                              
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'euc',
+                  config_name: dev_environment('euc', isDraft)['pr'].env,
                   environment: environment_euc
                 ]
-              ) 
+              )
             },
             cnn: {
+              def isDraft = env.CHANGE_ID ? pullRequest.draft : false
               runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'cnn',
+                  config_name: dev_environment('cnn', isDraft)['pr'].env,
                   environment: environment_cnn
                 ]
-              ) 
+              )
             }
           )        
         } catch(e) {
@@ -286,9 +302,10 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'euc',
+                  config_name: dev_environment[branch[0]].env,
                   environment: environment_euc
                 ]
-              ) 
+              )
             },
             cnn: {
               runWithPod(
@@ -296,9 +313,10 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'cnn',
+                  config_name: dev_environment[branch[0]].env,
                   environment: environment_cnn
                 ]
-              ) 
+              )
             }
           )          
         } catch (e) {
