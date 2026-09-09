@@ -250,10 +250,11 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc1: {    
-              runWithPod(
+              def node_config_euc = []
+              runWithPod(                
                 pipeline_infra,
-                node_config_euc1 + node_config,
-                node_config_euc1 + [
+                node_config_euc + node_config,
+                node_config_euc + [
                   stage_phases: stage_phases,
                   cloud: 'euc1',
                   environment: environment_euc1
@@ -261,10 +262,11 @@ if (dev_environment.containsKey(branch[0])) {
               ) 
             },
             cnn1: {
+              def node_config_cnn = []
               runWithPod(
                 pipeline_infra,
-                node_config_cnn1 + node_config,
-                node_config_cnn1 + [
+                node_config_cnn + node_config,
+                node_config_cnn + [
                   stage_phases: stage_phases,
                   cloud: 'cnn1',
                   environment: environment_cnn1
