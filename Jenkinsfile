@@ -258,7 +258,7 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'euc',
-                  environment: environment_euc1
+                  environment: environment_euc
                 ]
               ) 
             },
@@ -268,7 +268,7 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'cnn',
-                  environment: environment_cnn1
+                  environment: environment_cnn
                 ]
               ) 
             }
@@ -285,7 +285,7 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'euc',
-                  environment: environment_euc1
+                  environment: environment_euc
                 ]
               ) 
             },
@@ -295,7 +295,7 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'cnn',
-                  environment: environment_cnn1
+                  environment: environment_cnn
                 ]
               ) 
             }
