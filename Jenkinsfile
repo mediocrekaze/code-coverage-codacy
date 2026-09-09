@@ -90,6 +90,8 @@ def pr_workspace_label = "workspace"
 def gha_label = "gha"
 def pr_workspace_label_present = false
 
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// pull request
 if(env.CHANGE_ID) {
   dev_environment.pr = [ build: true, test: false, destroy: true, env: pullRequest.draft? 'aws-com-dev-euc1' : 'aws-com-dev-jenkins-euc1' ]
   stage("stage env") {
@@ -153,6 +155,8 @@ if(env.CHANGE_ID) {
   )
 }
 
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// branch
 else {
   branch = env.BRANCH_NAME.tokenize('/')
   pr_id = false
@@ -184,14 +188,8 @@ else {
   }
 }
 
-//echo "DEBUG branch = ${branch}"
-//echo "DEBUG branch[0] = ${branch[0]}"
-//echo "DEBUG dev_environment contains branch = ${dev_environment.containsKey(branch[0])}"
-//echo "DEBUG build = ${dev_environment[branch[0]]?.build}"
-//echo "DEBUG plan_only = ${plan_only}"
-//echo "DEBUG create_workspace = ${create_workspace}"
-//echo "DEBUG pr_workspace_label_present = ${pr_workspace_label_present}"
-
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// development (actual deployment)
 
 if (dev_environment.containsKey(branch[0])) {
   def stage_prepare = [
@@ -254,7 +252,8 @@ if (dev_environment.containsKey(branch[0])) {
             euc1: {    
               runWithPod(
                 pipeline_infra,
-                node_config + [
+                node_config_euc1 + node_config,
+                node_config_euc1 + [
                   stage_phases: stage_phases,
                   cloud: 'euc1',
                   environment: environment_euc1
@@ -264,7 +263,8 @@ if (dev_environment.containsKey(branch[0])) {
             cnn1: {
               runWithPod(
                 pipeline_infra,
-                node_config + [
+                node_config_cnn1 + node_config,
+                node_config_cnn1 + [
                   stage_phases: stage_phases,
                   cloud: 'cnn1',
                   environment: environment_cnn1
@@ -304,6 +304,7 @@ if (dev_environment.containsKey(branch[0])) {
         }
     }
   }
+  // merge and fast forward
   if (pr_id == false && plan_only == false && dev_environment[branch[0]].containsKey('transition')) {
     if (dev_environment[branch[0]].merge)
       runWithPod(merge, [
@@ -321,6 +322,8 @@ if (dev_environment.containsKey(branch[0])) {
   }
 }
 
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// production (actual deployment)
 else if (branch[0] == 'production') {
   def stage_phases = [:]
   def plan_phase = [:]
@@ -353,6 +356,32 @@ else if (branch[0] == 'production') {
     env = "aws-com-${branch[1]}-euc1".toString()
   }
 
+  if (plan_only) {
+    runWithPod(
+      pipeline_infra,
+      node_config + [
+        stage_phases: stage_phases,
+        //cloud: 'cnn1',
+        //environment: environment_cnn1
+      ]
+    ) 
+  } else {
+    try {
+      runWithPod(
+        pipeline_infra,
+        node_config + [
+          stage_phases: stage_phases,
+          //cloud: 'cnn1',
+          //environment: environment_cnn1
+        ]
+      )      
+    } catch (e) {
+      throw e
+    }
+  }
+}
+
+if (branch[0] == 'main') {
 
 }
 
