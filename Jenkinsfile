@@ -255,8 +255,8 @@ if (dev_environment.containsKey(branch[0])) {
             euc1: {    
               runWithPod(                              
                 pipeline_infra,
-                node_config_euc + node_config,
                 node_config_euc + [
+                  node_config,
                   stage_phases: stage_phases,
                   cloud: 'euc1',
                   environment: environment_euc1
@@ -266,8 +266,8 @@ if (dev_environment.containsKey(branch[0])) {
             cnn1: {
               runWithPod(
                 pipeline_infra,
-                node_config_cnn + node_config,
                 node_config_cnn + [
+                  node_config,
                   stage_phases: stage_phases,
                   cloud: 'cnn1',
                   environment: environment_cnn1
