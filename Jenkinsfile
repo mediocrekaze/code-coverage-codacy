@@ -21,6 +21,9 @@ def node_config = [
   ]
 ]
 
+def node_config_euc = []
+def node_config_cnn = []
+
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
     checkout(scm)
@@ -250,8 +253,7 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc1: {    
-              def node_config_euc = []
-              runWithPod(                
+              runWithPod(                              
                 pipeline_infra,
                 node_config_euc + node_config,
                 node_config_euc + [
@@ -262,7 +264,6 @@ if (dev_environment.containsKey(branch[0])) {
               ) 
             },
             cnn1: {
-              def node_config_cnn = []
               runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config,
