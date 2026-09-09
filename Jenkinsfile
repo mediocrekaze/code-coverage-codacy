@@ -3,13 +3,13 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 
-def environment_euc1 = [
-  "env_code=euc1",
+def environment_euc = [
+  "env_code=euc",
   "aws_code=aws-com"
 ]
 
-def environment_cnn1 = [
-  "env_code=cnn1",
+def environment_cnn = [
+  "env_code=cnn",
   "aws_code=aws-cnn"
 ]
 
@@ -252,22 +252,22 @@ if (dev_environment.containsKey(branch[0])) {
       if (create_workspace)
         try {
           parallel(
-            euc1: {    
+            euc: {    
               runWithPod(                              
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
-                  cloud: 'euc1',
+                  cloud: 'euc',
                   environment: environment_euc1
                 ]
               ) 
             },
-            cnn1: {
+            cnn: {
               runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
-                  cloud: 'cnn1',
+                  cloud: 'cnn',
                   environment: environment_cnn1
                 ]
               ) 
@@ -279,22 +279,22 @@ if (dev_environment.containsKey(branch[0])) {
     } else {
         try {
           parallel(
-            euc1: {    
+            euc: {    
               runWithPod(
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
-                  cloud: 'euc1',
+                  cloud: 'euc',
                   environment: environment_euc1
                 ]
               ) 
             },
-            cnn1: {
+            cnn: {
               runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
-                  cloud: 'cnn1',
+                  cloud: 'cnn',
                   environment: environment_cnn1
                 ]
               ) 
