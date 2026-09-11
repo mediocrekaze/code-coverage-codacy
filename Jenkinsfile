@@ -31,7 +31,7 @@ Closure pipeline_infra = { config ->
   try {
     config.stage_phases.each { job ->
       if(job instanceof ArrayList) {
-        job_dict = [:]
+        def job_dict = [:]
         job.each { sub_job ->
           job_dict[sub_job.name] = {
             def stage_name = config.cloud + " " + sub_job.name
@@ -46,7 +46,7 @@ Closure pipeline_infra = { config ->
             }
           }
         }
-        parallel job_dict
+        parallel(job_dict)
       }
       else {
         def stage_name = config.cloud + " " + job.name
