@@ -64,7 +64,7 @@ Closure get_test_instance_config = {
   return null
 }
 
-def euc_test_display [:]
+def euc_test_display = [:]
 
 Closure euc_get_test = {
   def testme = new hashtag.Test()
