@@ -79,12 +79,12 @@ Closure euc_get_test = {
   )
 }
 
-k8s.setBinding(this.binding)
-k8s.dynamicPod(
-  euc_get_test,
-  cloud: 'euc',
-  node_config
-)
+//k8s.setBinding(this.binding)
+//k8s.dynamicPod(
+//  euc_get_test,
+//  cloud: 'euc',
+//  node_config
+//)
 
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
@@ -326,7 +326,7 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc: {
-              runWithPod(                              
+              k8s.dynamicPod(                              
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
@@ -337,7 +337,7 @@ if (dev_environment.containsKey(branch[0])) {
               )
             },
             cnn: {
-              runWithPod(
+              k8s.dynamicPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
@@ -355,7 +355,7 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc: {    
-              runWithPod(
+              k8s.dynamicPod(
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
@@ -366,7 +366,7 @@ if (dev_environment.containsKey(branch[0])) {
               )
             },
             cnn: {
-              runWithPod(
+              k8s.dynamicPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
