@@ -115,7 +115,7 @@ Closure fast_forward = { config ->
     sshagent (credentials: ['mediocrewind-ssh']) {
       sh("""
         mkdir ~/.ssh
-        ssh-keygen -t rsa github.com >> ~/.ssh/known_hosts
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
         git clone git@github.com:mediocrekaze/code-coverage-codacy.git . -b ${ config.source }
         git push origin ${ config.source }:${ config.destination } ${config?.force ? '--force' : ''}
       """)
@@ -128,7 +128,7 @@ Closure merge = { config ->
     sshagent (credentials: ['mediocrewind-ssh']) {
       sh("""
         mkdir ~/.ssh
-        ssh-keygen -t rsa github.com >> ~/.ssh/known_hosts
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
         git config --global user.email "arcenoallan214@gmail.com"
         git config --global user.name "Allan Arceno"
         git clone git@github.com:mediocrekaze/code-coverage-codacy.git . -b ${ config.destination }
