@@ -109,7 +109,7 @@ def environment_cnn = [
 ]
 
 
-Closure fast_forward - { config ->
+Closure fast_forward = { config ->
   stage("Fast Forward")
     echo("fast forward (${ config.source } -> ${ config.destination })")
     sshagent (credentials: ['mediocrewind-ssh']) {
