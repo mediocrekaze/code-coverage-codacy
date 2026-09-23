@@ -66,7 +66,7 @@ Closure get_test_instance_config = {
 
 def euc_test_display = [:]
 
-Closure euc_get_test = {
+Closure euc_get_test = { config ->
   def testme = new hashtag.Test()
   def test_environment = get_test_instance_config(env.BRANCH_NAME)
   if (test_environment == null) {
