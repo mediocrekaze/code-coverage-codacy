@@ -73,18 +73,16 @@ Closure euc_get_test = {
     return
   }
   def test_instance = test_instance_config.euc[test_environment]
-  euc_test_display = testme.getDisplay(
+  euc_test_display = testme.getDisplay([
     test_instance_role: test_instance.role,
     test_instance_addr: test_instance.address
-  )
+  ])
 }
 
-//k8s.setBinding(this.binding)
-//k8s.dynamicPod(
-//  euc_get_test,
-//  cloud: 'euc',
-//  node_config
-//)
+k8s.dynamicPod(
+  euc_get_test,
+  cloud: 'euc'
+)
 
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
@@ -326,7 +324,7 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc: {
-              k8s.dynamicPod(                              
+              runWithPod(                              
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
@@ -337,7 +335,7 @@ if (dev_environment.containsKey(branch[0])) {
               )
             },
             cnn: {
-              k8s.dynamicPod(
+              runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
@@ -355,7 +353,7 @@ if (dev_environment.containsKey(branch[0])) {
         try {
           parallel(
             euc: {    
-              k8s.dynamicPod(
+              runWithPod(
                 pipeline_infra,
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
@@ -366,7 +364,7 @@ if (dev_environment.containsKey(branch[0])) {
               )
             },
             cnn: {
-              k8s.dynamicPod(
+              runWithPod(
                 pipeline_infra,
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
