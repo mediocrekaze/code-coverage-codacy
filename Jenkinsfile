@@ -79,14 +79,12 @@ Closure euc_get_test = {
   )
 }
 
-echo "CLASS = ${k8s.getClass().name}"
-echo "METHODS = ${k8s.metaClass.methods*.name.unique().sort()}"
-
-//k8s.dynamicPod(
-//  euc_get_test,
-//  cloud: 'euc',
-//  node_config
-//)
+k8s.setBinding(this.binding)
+k8s.dynamicPod(
+  euc_get_test,
+  cloud: 'euc',
+  node_config
+)
 
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
