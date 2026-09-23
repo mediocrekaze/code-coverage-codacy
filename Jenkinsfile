@@ -220,6 +220,7 @@ if(env.CHANGE_ID) {
   branch = [ env.CHANGE_TARGET ]
   workspace = env.CHANGE_TARGET
   
+  // creating test workspace on development
   if (workspace == 'codacydev') {
     create_workspace = true
     pr_changed_files = pullRequest.files.collect {
@@ -227,6 +228,7 @@ if(env.CHANGE_ID) {
     }
   }
 
+  // production plan for pr
   if (env.CHANGE_TARGET.startsWith('production/')) {
     branch = env.CHANGE_TARGET.tokenize('/')
   }
@@ -280,8 +282,8 @@ else {
   else if (branch[0] == 'main') {}
 
   else {
-    branch = [ 'development' ]
-    workspace = "development"
+    branch = [ 'codacydev' ]
+    workspace = "codacydev"
     plan_only = true
   }
 }
