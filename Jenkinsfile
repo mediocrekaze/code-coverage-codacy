@@ -96,14 +96,14 @@ k8s.dynamicPod(
 
 def environment_euc = [
   "env_code=euc",
-  "aws_code=aws-com"
+  "aws_code=aws-com",
   "role_value=${euc_test_display.role_value}",
   "addr_value=${euc_test_display.addr_value}"
 ]
 
 def environment_cnn = [
   "env_code=cnn",
-  "aws_code=aws-cnn"
+  "aws_code=aws-cnn",
   "role_value=${cnn_test_display.role_value}",
   "addr_value=${cnn_test_display.addr_value}"
 ]
