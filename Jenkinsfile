@@ -13,7 +13,7 @@ def environment_cnn = [
   "aws_code=aws-cnn"
 ]
 
-//def k8s = new io.kubernetes.Pod()
+def k8s = new io.kubernetes.Pod()
 
 def cloud = ""
 def node_config = [
@@ -79,7 +79,11 @@ Closure euc_get_test = {
   )
 }
 
-runWithPod(euc_get_test, cloud: 'euc')
+k8s.dynamicPod(
+  euc_get_test,
+  cloud: 'euc',
+  node_config
+)
 
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
