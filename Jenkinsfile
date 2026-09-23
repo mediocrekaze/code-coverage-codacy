@@ -304,9 +304,9 @@ else {
     }
     if (branch[0] == 'workspace') {
       workspace = branch[1..-1].join("-").toLowerCase().replaceAll("_","-")
-    }
-    if (!(workspace ==~ "(?=.{3,20}\$)(?!-)(?!.*--)[a-z0-9-]+(?<!-)") || dev_environment.containsKey(workspace)) {
-      error("invalid workspace name")
+      if (!(workspace ==~ "(?=.{3,20}\$)(?!-)(?!.*--)[a-z0-9-]+(?<!-)") || dev_environment.containsKey(workspace)) {
+        error("invalid workspace name")
+      }
     }
   }
   else if (branch[0] == 'production') {
