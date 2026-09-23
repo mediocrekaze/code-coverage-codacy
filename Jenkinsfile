@@ -13,6 +13,8 @@ def environment_cnn = [
   "aws_code=aws-cnn"
 ]
 
+def k8s = new io.kubernetes.Pod()
+
 def cloud = ""
 def node_config = [
   podConfig : [
@@ -23,6 +25,61 @@ def node_config = [
 
 def node_config_euc = [:]
 def node_config_cnn = [:]
+
+
+
+def test_instance_config = [
+  euc: [
+    dev: [
+      address: 'https://test.dev.mediocrewind.com',
+      role: 'euc-dev-test'
+    ],
+    prd: [
+      address: 'https://test.mediocrewind.com',
+      role: 'euc-prd-test'
+    ]
+  ],
+  cnn: [
+    dev: [
+      address: 'https://test.dev.mediocrewind.cn',
+      role: 'cnn-dev-test'
+    ],
+    prd: [
+      address: 'https://test.mediocrewind.cn',
+      role: 'cnn-prd-test'
+    ]
+  ]
+]
+
+Closure get_test_instance_config = {
+  if (env.CHANGE_ID) {
+    return 'dev'
+  }
+  if (branch_name in ['codacystg', 'codacysvc', 'codacydem']) {
+    return 'dev'
+  }
+  if (branch_name ==~ /^production\/.*/) {
+    return 'prd'
+  }
+  return null
+}
+
+def euc_test_display [:]
+
+Closure euc_get_test = {
+  def testme = new hashtag.Test()
+  def test_environment = get_test_instance_config(env.BRANCH_NAME)
+  if (test_environment == null) {
+    return
+  }
+  def test_instance = test_instance_config.euc[test_environment]
+  euc_test_display = testme.getDisplay(
+    test_instance_role: test_instance.role,
+    test_instance_addr: test_instance.address
+  )
+}
+
+k8s.dynamicPod(euc_get_test, cloud: 'euc')
 
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
@@ -90,7 +147,7 @@ def dev_environment = [
   ]
 
 dev_environment.pr = [ build: true, test: false, destroy: true, env: 'ENV_CODE-dev-jenkins' ]
-
+euc_test_display
 def branch = []
 def create_workspace = false
 def pr_id = false
