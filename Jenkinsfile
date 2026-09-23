@@ -77,7 +77,7 @@ Closure euc_get_test = {
     test_instance_role: test_instance.role,
     test_instance_addr: test_instance.address
   ])
-  withEnv([CODE_ENV='euc', CODE_WPC=''euc])
+  withEnv([CODE_ENV='euc', CODE_WPC='euc'])
 }
 
 k8s.dynamicPod(
