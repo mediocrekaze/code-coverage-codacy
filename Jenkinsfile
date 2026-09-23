@@ -108,6 +108,40 @@ def environment_cnn = [
   "addr_value=${cnn_test_display.addr_value}"
 ]
 
+
+Closure fast_forward - { config ->
+  stage("Fast Forward")
+    echo("fast forward (${ config.source } -> ${ config.destination })")
+    sshagent (credentials: ['mediocrewind-ssh']) {
+      sh("""
+        mkdir ~/.ssh
+        ssh-keygen -t rsa github.com >> ~/.ssh/known_hosts
+        git clone git@github.com:mediocrekaze/code-coverage-codacy.git . -b ${ config.source }
+        git push origin ${ config.source }:${ config.destination } ${config?.force ? '--force' : ''}
+      """)
+    }
+}
+
+Closure merge = { config ->
+  stage("Merge") {
+    echo("merge (${ config.source } -> ${ config.destination })")
+    sshagent (credentials: ['mediocrewind-ssh']) {
+      sh("""
+        mkdir ~/.ssh
+        ssh-keygen -t rsa github.com >> ~/.ssh/known_hosts
+        git config --global user.email "arcenoallan214@gmail.com"
+        git config --global user.name "Allan Arceno"
+        git clone git@github.com:mediocrekaze/code-coverage-codacy.git . -b ${ config.destination }
+        git merge ${ config.merge_args.join(' ') } origin/${ config.source } --no-edit
+        git push origin ${ config.destination } ${config?.force ? '--force' : ''}
+      """)
+    }
+  }
+
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// pipeline logic execution
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
     checkout(scm)
@@ -409,14 +443,18 @@ if (dev_environment.containsKey(branch[0])) {
   // merge and fast forward
   if (pr_id == false && plan_only == false && dev_environment[branch[0]].containsKey('transition')) {
     if (dev_environment[branch[0]].merge)
-      runWithPod(merge, [
-        source: branch[0],
-        destination: dev_environment[branch[0]].transition,
-        force: dev_environment[branch[0]].force,
-        merge_args: dev_environment[branch[0]].merge_args
+      runWithPod(merge, 
+        node_config + [
+          cloud: 'euc',
+          source: branch[0],
+          destination: dev_environment[branch[0]].transition,
+          force: dev_environment[branch[0]].force,
+          merge_args: dev_environment[branch[0]].merge_args
       ])
     else
-      runWithPod(fast_forward, [
+      runWithPod(fast_forward, 
+        node_config + [
+        cloud: 'euc',
         source: branch[0],
         destination: dev_environment[branch[0]].transition,
         force: dev_environment[branch[0]].force
