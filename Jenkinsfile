@@ -79,7 +79,7 @@ def euc_test_display = [:]
 //  ])
 //}
 
-Closure euc_get_test = { 
+Closure euc_get_test = { config ->
   stage(config.cloud + " " + "checkout") {
     checkout(scm)
   }
