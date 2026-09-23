@@ -3,16 +3,6 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 
-def environment_euc = [
-  "env_code=euc",
-  "aws_code=aws-com"
-]
-
-def environment_cnn = [
-  "env_code=cnn",
-  "aws_code=aws-cnn"
-]
-
 def k8s = new io.kubernetes.Pod()
 
 def cloud = ""
@@ -104,6 +94,20 @@ k8s.dynamicPod(
   node_config + [cloud: 'cnn']
 )
 
+def environment_euc = [
+  "env_code=euc",
+  "aws_code=aws-com"
+  "role_value=${euc_test_display.role_value}",
+  "addr_value=${euc_test_display.addr_value}"
+]
+
+def environment_cnn = [
+  "env_code=cnn",
+  "aws_code=aws-cnn"
+  "role_value=${cnn_test_display.role_value}",
+  "addr_value=${cnn_test_display.addr_value}"
+]
+
 Closure pipeline_infra = { config ->
   stage(config.cloud + " " + "checkout") {
     checkout(scm)
@@ -119,7 +123,7 @@ Closure pipeline_infra = { config ->
               withEnv(config.environment + ["STAGE_NAME=${sub_job.name}", "config_name=${config.config_name}" ]) {
                 echo "running with environment: ${config.environment}"
                 sh '''
-                  echo "env_code=$env_code    aws_code=$aws_code    stage_name='$STAGE_NAME'   config_name='$config_name'"   >> env.txt
+                  echo "env_code=$env_code aws_code=$aws_code role_value=$role_value addr_value=$addr_value stage_name='$STAGE_NAME' config_name='$config_name'"   >> env.txt
                 '''
               }
               echo " name: ${sub_job.name}, ${sub_job.description}"
