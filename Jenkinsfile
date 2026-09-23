@@ -87,8 +87,7 @@ Closure euc_get_test = { config ->
 
 k8s.dynamicPod(
   euc_get_test,
-  cloud: 'euc',
-  node_config
+  node_config + [cloud: 'euc',]
 )
 
 Closure pipeline_infra = { config ->
