@@ -80,8 +80,8 @@ def euc_test_display = [:]
 //  withEnv([CODE_ENV='euc', CODE_WPC='euc'])
 //}
 
-Closure euc_get_test = { 
-  stage("checkout") {
+Closure euc_get_test = { config ->
+  stage(config.cloud + " " + "checkout") {
     checkout(scm)
   }
 }
