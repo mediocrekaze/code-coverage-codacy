@@ -66,21 +66,18 @@ Closure get_test_instance_config = {
 
 def euc_test_display = [:]
 
-//Closure euc_get_test = { 
-//  def testme = new hashtag.Test()
-//  def test_environment = get_test_instance_config(env.BRANCH_NAME)
-//  if (test_environment == null) {
-//    return
-//  }
-//  def test_instance = test_instance_config.euc[test_environment]
-//  euc_test_display = testme.getDisplay([
-//    test_instance_role: test_instance.role,
-//    test_instance_addr: test_instance.address
-//  ])
-//}
-
 Closure euc_get_test = { 
-  echo "euc_get_test started"
+  def testme = new hashtag.Test()
+  def test_environment = get_test_instance_config(env.BRANCH_NAME)
+  if (test_environment == null) {
+    return
+  }
+  def test_instance = test_instance_config.euc[test_environment]
+  euc_test_display = testme.getDisplay([
+    test_instance_role: test_instance.role,
+    test_instance_addr: test_instance.address
+  ])
+  withEnv([CODE_ENV='euc', CODE_WPC=''euc])
 }
 
 k8s.dynamicPod(
