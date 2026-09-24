@@ -420,7 +420,7 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_euc + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'euc',
-                  config_name: dev_environment[branch[0]].env,
+                  config_name: dev_environment['pr'].env.replace('ENV_CODE', 'euc'),
                   environment: environment_euc
                 ]
               )
@@ -431,7 +431,7 @@ if (dev_environment.containsKey(branch[0])) {
                 node_config_cnn + node_config + [
                   stage_phases: stage_phases,
                   cloud: 'cnn',
-                  config_name: dev_environment[branch[0]].env,
+                  config_name: dev_environment['pr'].env.replace('ENV_CODE', 'cnn'),
                   environment: environment_cnn
                 ]
               )
