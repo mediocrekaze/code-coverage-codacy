@@ -117,6 +117,7 @@ Closure fast_forward = { config ->
         mkdir ~/.ssh
         ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
         git clone git@github.com:mediocrekaze/code-coverage-codacy.git . -b ${ config.source }
+        git config --global --add safe.directory "\$PWD"
         git push origin ${ config.source }:${ config.destination } ${config?.force ? '--force' : ''}
       """)
     }
@@ -132,6 +133,7 @@ Closure merge = { config ->
         git config --global user.email "arcenoallan214@gmail.com"
         git config --global user.name "Allan Arceno"
         git clone git@github.com:mediocrekaze/code-coverage-codacy.git . -b ${ config.destination }
+        git config --global --add safe.directory "\$PWD"
         git merge ${ config.merge_args.join(' ') } origin/${ config.source } --no-edit
         git push origin ${ config.destination } ${config?.force ? '--force' : ''}
       """)
@@ -200,11 +202,11 @@ def dev_environment_backup = [
 def dev_environment = [
     workspace: [ build: true, test: false, destroy: false, env:'ENV_CODE-dev' ],
     pr:        [:],
-    codacydev: [ transition: 'codacystg', build: true, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'ENV_CODE-dev' ],
+    codacydev: [ transition: 'codacystg', build: false, force: false, test: false, destroy: false, merge: false, merge_args: [], env:'ENV_CODE-dev' ],
     codacystg: [ transition: 'codacysvc', build: true, force: false, test: true, destroy: false, merge: false, merge_args: [], env:'ENV_CODE-dev-main' ],
     codacysvc: [ transition: 'codacydem', build: true, force: false, test: false, destroy: false,  merge: false, merge_args: [], env:'ENV_CODE-svc' ],
     codacydem: [ transition: 'main', build: true, force: true, test: false, destroy: false, merge: true, merge_args: ['-X ours'], env:'ENV_CODE-dev-dem' ],
-    main:      [ transition: 'codacydev', build: true, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'ENV_CODE-dev-main' ]
+    main:      [ transition: 'codacydev', build: false, force: true, test: false, destroy: false,  merge: true, merge_args: ['-X theirs'], env:'ENV_CODE-dev-main' ]
   ]
 
 dev_environment.pr = [ build: true, test: false, destroy: true, env: 'ENV_CODE-dev-jenkins' ]
