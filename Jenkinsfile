@@ -171,6 +171,12 @@ Closure pipeline_infra = { config ->
       else {
         def stage_name = config.cloud + " " + job.name
         stage(stage_name) {
+          withEnv(config.environment + ["STAGE_NAME=${job.name}", "config_name=${config.config_name}" ]) {
+            echo "running with environment: ${config.environment}"
+            sh '''
+              echo "env_code=$env_code aws_code=$aws_code role_value=$role_value addr_value=$addr_value stage_name='$STAGE_NAME' config_name='$config_name'"   >> env.txt
+            '''
+          }
           echo " name: ${job.name}, ${job.description}"
         }
       }
